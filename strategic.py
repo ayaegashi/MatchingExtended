@@ -1,42 +1,26 @@
 #!/usr/bin/python
 
 import random
-from messages import Upload, Request
-from util import even_split
 
-class Peer:
-    def __init__(self, config, id, init_pieces, up_bandwidth):
-        self.conf = config
+class Participant:
+    def __init__(self, id, gender, sexuality):
         self.id = id
-        self.pieces = init_pieces[:]
-        # bandwidth measured in blocks-per-time-period
-        self.up_bw = round(up_bandwidth)
+        self.gender = gender
+        self.sexuality = sexuality
+        self.desirability = random.randint(0,100)
+        self.preference_order_list = []
+        self.cutoff = -1
 
-        # This is an upper bound on the number of requests to send to
-        # each peer -- they can't possibly handle more than this in one round
-        self.max_requests = round(self.conf.max_up_bw / self.conf.blocks_per_piece + 1)
-        self.max_requests = int(min(self.max_requests, self.conf.num_pieces))
+    def preference_order(self, agents):
+        # Need to match on own sexuality, other agent's sexuality
+        not_attracted = []
+        attracted = []
+        for agent in agents:
+            if agent.gender in self.sexuality:
+                attracted.push(agent)
+            else:
+                not_attracted.push(agent)
 
-        self.post_init()
-
-    def __repr__(self):
-        return "%s(id=%s pieces=%s up_bw=%d)" % (
-            self.__class__.__name__,
-            self.id, self.pieces, self.up_bw)
-
-    def update_pieces(self, new_pieces):
-        """
-        Called by the sim when this peer gets new pieces.  Using a function
-        so it's easy to add any extra processing...
-        """
-        self.pieces = new_pieces
-
-    def requests(self, peers, history):
-        return []
-
-    def uploads(self, requests, peers, history):
-        return []
-
-    def post_init(self):
-        # Here to be overridden by child classes
-        pass
+        attracted = sorted(attracted, lambda x: abs(self.desirability - x.desirability), reverse=True)
+        self.preference_order_list = attracted + not_attracted
+        self.cutoff = len(attracted)

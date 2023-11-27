@@ -22,6 +22,11 @@ from util import *
 from stats import Stats
 from history import History
 
+# Genders
+FEMALE = 0
+MALE = 1
+NONBINARY = 2
+
 
 class Sim:
     def __init__(self, config):
