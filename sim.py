@@ -26,6 +26,7 @@ NONBINARY = 2
 class Sim:
     def __init__(self):
         self.participants = set()
+        self.total_utility = 0
         num_women = 10
         num_men = 10
         num_nb = 10
@@ -52,7 +53,6 @@ class Sim:
 
 
     def runMatch(self):
-
         set_proposed_to = set()
         # iterating through all participants
         print("in run match")
@@ -60,8 +60,7 @@ class Sim:
             print("in for loop")
             
             proposer = participant
-    
-                
+
             next_choice = proposer.preference_order_list[proposer.ask_rank]
 
             # iterating through preference list of proposer, switching to anyone rejected due to current proposer
@@ -87,10 +86,6 @@ class Sim:
 
     
     
-                        
-
-
-    
     def proposal_accepted(self, proposer, next_choice):
         
         # if not paired with anyone yet, accepts first offer
@@ -114,6 +109,25 @@ class Sim:
 
         # new proposer not possible matchings for the proposed  
         return False
+
+    def sum_utilities(self):
+        for participant in self.participants:
+            total_utility += participant.calculate_utility(participant.paired_with)
+
+
+    def check_if_stable(self):
+        for participant in self.participants:
+
+            for i in range(participant.ask_rank):
+                preferred_to_match = participant.preference_order_list[i]
+                preferred_to_match_ask_rank = preferred_to_match.ask_rank
+                if participant in preferred_to_match.preference_order_list[:preferred_to_match_ask_rank]:
+                    return False
+                
+        return True
+            
+
+
             
 new_simulation = Sim()
 new_simulation.runMatch()
@@ -126,6 +140,7 @@ for participant in new_simulation.participants:
     else:
         print("no match")
 
+print(new_simulation.total_utility)
         
 
 

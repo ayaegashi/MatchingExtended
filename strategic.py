@@ -28,3 +28,11 @@ class ParticipantStrategic:
         attracted = sorted(attracted, lambda x: abs(self.desirability - x.desirability), reverse=True)
         self.preference_order_list = attracted + not_attracted
         self.cutoff = len(attracted)
+
+    def calculate_utility(self, match):
+        if match not in self.preference_order_list:
+            return 0
+        for p in self.preference_order_list:
+            if match == p:
+                return match.desirability
+            maxUtil -= 1
