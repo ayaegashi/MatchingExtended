@@ -57,7 +57,7 @@ class Sim:
         # iterating through all participants
         print("in run match")
         for participant in self.participants:
-            print("in for loop")
+            # print("in for loop")
             
             proposer = participant
 
@@ -65,7 +65,7 @@ class Sim:
 
             # iterating through preference list of proposer, switching to anyone rejected due to current proposer
             while next_choice not in set_proposed_to and proposer.ask_rank < proposer.cutoff:
-                print("in while loop")
+                # print("in while loop")
                 # Proposer proposing to next choice
                 if self.proposal_accepted(proposer, next_choice):
                      
@@ -91,7 +91,7 @@ class Sim:
         # if not paired with anyone yet, accepts first offer
         # if next_choice.paired_with is None:
         #     return True 
-        print("in proposal_accepted")
+        # print("in proposal_accepted")
         current_next_choice_pair_id = next_choice.paired_with.id if next_choice.paired_with is not None else -1
         for i in range(next_choice.cutoff):
             # see which id is encountered first in preference list of person proposed to
@@ -179,16 +179,31 @@ def main(args):
     parser.add_option("--checkStability",
                       dest="check_stability", default=False, action="store_true",
                       help="Set whether or not you want to check for stability")
+    
+    parser.add_option("--numReps",
+                      dest="num_reps", default=1, type="int",
+                      help="Set the number of repetitions")
 
     (options, args) = parser.parse_args()
     print(options)
     
-    sim = Sim(options)
-    sim.runMatch
+    utilities = []
+    stabilities = []
+    for i in range(options.num_reps):
+        sim = Sim(options)
+        sim.runMatch()
+        # append utility to utilities array
 
+        if options.check_stability:
+            print("Checking Stability")
+            print(sim.check_if_stable())
+            stable = sim.check_if_stable()
+            stabilities.append(stable)
+        
+    # Print results:
     if options.check_stability:
-        print("Checking Stability")
-        print(sim.check_if_stable())
+        print(sum(stable) / len(stable), "percent of simulations resulted in a stable matching.")
+    print("The utility across runs was", sim(utilities) / len(utilities))
 
 
 if __name__ == "__main__":
