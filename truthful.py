@@ -35,6 +35,5 @@ class ParticipantTruthful:
         for p in self.preference_order_list:
             if match == p:
                 return match.desirability
-            maxUtil -= 1
 
 

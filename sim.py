@@ -26,11 +26,12 @@ NONBINARY = 2
 class Sim:
     def __init__(self, options):
         self.participants = set()
-        self.total_utility = 0
+        self.avg_utility = 0
         num_women = options.num_women
         num_men = options.num_men
         num_nb = options.num_nb
         total = num_women  + num_nb + num_men
+        self.num_participants = total
 
         sexualities = list(chain.from_iterable(combinations([FEMALE, MALE, NONBINARY], r) for r in range(1, 4)))
 
@@ -110,9 +111,11 @@ class Sim:
         # new proposer not possible matchings for the proposed  
         return False
 
-    def sum_utilities(self):
+    def calc_avg_utility(self):
+        total_utility = 0
         for participant in self.participants:
             total_utility += participant.calculate_utility(participant.paired_with)
+        self.avg_utility = total_utility / self.num_participants
 
 
     def check_if_stable(self):
@@ -126,6 +129,18 @@ class Sim:
                 
         return True
             
+    def print_results(self):
+
+        print("Match results")
+        print("------------------------------")
+        for participant in self.participants:
+            if participant.paired_with:
+                print("Participant " + str(participant.id) + " matched with Participant " + str(participant.paired_with.id))
+            else:
+                print("Participant " + str(participant.id) + "unmatched")
+        print("------------------------------")
+
+        print("Average utility among participants:", self.avg_utility)
 
 
             
@@ -192,7 +207,9 @@ def main(args):
     for i in range(options.num_reps):
         sim = Sim(options)
         sim.runMatch()
-        # append utility to utilities array
+        sim.calc_avg_utility()
+        sim.print_results()
+        utilities.append(sim.avg_utility);
 
         if options.check_stability:
             print("Checking Stability")
@@ -202,8 +219,8 @@ def main(args):
         
     # Print results:
     if options.check_stability:
-        print(sum(stable) / len(stable), "percent of simulations resulted in a stable matching.")
-    print("The utility across runs was", sim(utilities) / len(utilities))
+        print(sum(stabilities) / len(stabilities), "percent of simulations resulted in a stable matching.")
+    print("The utility across runs was", sum(utilities) / len(utilities))
 
 
 if __name__ == "__main__":
