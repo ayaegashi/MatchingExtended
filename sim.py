@@ -22,6 +22,8 @@ FEMALE = 0
 MALE = 1
 NONBINARY = 2
 
+def coin_flip(p):
+    return 0 if random.random() < p else 1
 
 class Sim:
     def __init__(self, options):
@@ -30,12 +32,11 @@ class Sim:
         num_women = options.num_women
         num_men = options.num_men
         num_nb = options.num_nb
-        total = num_women  + num_nb + num_men
-        self.num_participants = total
+        self.num_participants = num_women  + num_nb + num_men
 
         sexualities = list(chain.from_iterable(combinations([FEMALE, MALE, NONBINARY], r) for r in range(1, 4)))
 
-        for i in range(total):
+        for i in range(self.num_participants):
             # generate gender
             if i < num_women:
                 gender = FEMALE
@@ -46,7 +47,10 @@ class Sim:
 
             # generate sexuality
             sexuality_id = random.randint(0,len(sexualities)-1)
-            participant = ParticipantStrategic(i, gender, sexualities[sexuality_id])
+            if coin_flip(options.percent_truthful) == 1:
+                participant = ParticipantStrategic(i, gender, sexualities[sexuality_id])
+            else:
+                participant = ParticipantTruthful(i, gender, sexualities[sexuality_id])
             self.participants.add(participant)
 
         for participant in self.participants:
@@ -56,10 +60,7 @@ class Sim:
     def runMatch(self):
         set_proposed_to = set()
         # iterating through all participants
-        print("in run match")
-        for participant in self.participants:
-            # print("in for loop")
-            
+        for participant in self.participants:     
             proposer = participant
 
             next_choice = proposer.preference_order_list[proposer.ask_rank]
@@ -88,11 +89,7 @@ class Sim:
     
     
     def proposal_accepted(self, proposer, next_choice):
-        
         # if not paired with anyone yet, accepts first offer
-        # if next_choice.paired_with is None:
-        #     return True 
-        # print("in proposal_accepted")
         current_next_choice_pair_id = next_choice.paired_with.id if next_choice.paired_with is not None else -1
         for i in range(next_choice.cutoff):
             # see which id is encountered first in preference list of person proposed to
@@ -144,30 +141,7 @@ class Sim:
 
 
             
-# new_simulation = Sim()
-# new_simulation.runMatch()
 
-# print("truthful sim")
-# for participant in new_simulation.participants:
-#     print("PARTICIPANT " + str(participant.id))
-#     if participant.paired_with:
-#         print("matched with " + str(participant.paired_with.id))
-#     else:
-#         print("no match")
-
-# print(new_simulation.total_utility)
-        
-
-
-
-
-
-# def parse_strategic(args):
-#     # might not work
-#     for c in args:
-#         s = c.split(',')
-#         name, count = s
-#     return count
 
 
 def main(args):
@@ -198,6 +172,10 @@ def main(args):
     parser.add_option("--numReps",
                       dest="num_reps", default=1, type="int",
                       help="Set the number of repetitions")
+    
+    parser.add_option("--percentTruthful",
+                      dest="percent_truthful", default=1, type="float",
+                      help="Set the percentage of agents who are truthful.")
 
     (options, args) = parser.parse_args()
     print(options)

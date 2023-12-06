@@ -9,6 +9,7 @@ class ParticipantStrategic:
         self.sexuality = sexuality
         self.desirability = random.randint(0,100)
         self.preference_order_list = []
+        self.true_preference_order = []
         self.cutoff = -1
         self.paired_with = None
         self.just_rejected = None
@@ -26,12 +27,16 @@ class ParticipantStrategic:
 
         attracted = sorted(attracted, key=lambda x: abs(self.desirability - x.desirability), reverse=True)
         self.preference_order_list = attracted + not_attracted
+
+        true_attracted = sorted(attracted, key=lambda x: x.desirability, reverse=True)
+        self.true_preference_order = true_attracted + not_attracted
+
         self.cutoff = len(attracted)
 
     def calculate_utility(self, match, maxUtil):
-        if match not in self.preference_order_list:
+        if match not in self.true_preference_order:
             return 0
-        for p in self.preference_order_list:
+        for p in self.true_preference_order:
             if match == p:
                 return maxUtil
             maxUtil -= 1
