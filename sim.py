@@ -114,7 +114,7 @@ class Sim:
     def calc_avg_utility(self):
         total_utility = 0
         for participant in self.participants:
-            total_utility += participant.calculate_utility(participant.paired_with)
+            total_utility += participant.calculate_utility(participant.paired_with, self.num_participants)
         self.avg_utility = total_utility / self.num_participants
 
 
@@ -137,7 +137,7 @@ class Sim:
             if participant.paired_with:
                 print("Participant " + str(participant.id) + " matched with Participant " + str(participant.paired_with.id))
             else:
-                print("Participant " + str(participant.id) + "unmatched")
+                print("Participant " + str(participant.id) + " unmatched")
         print("------------------------------")
 
         print("Average utility among participants:", self.avg_utility)
