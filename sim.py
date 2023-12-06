@@ -33,11 +33,12 @@ class Sim:
         num_men = options.num_men
         num_nb = options.num_nb
         self.num_participants = num_women  + num_nb + num_men
+        self.percent_match = 0
 
         sexualities = list(chain.from_iterable(combinations([FEMALE, MALE, NONBINARY], r) for r in range(1, 4)))
         weights = []
         if options.flex:
-            weights = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4]
+            weights = [0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.52]
         else:
             weights = [1/7]*7
 
@@ -52,7 +53,7 @@ class Sim:
 
             # generate sexuality
             sexuality = random.choices(sexualities, weights, k=1)[0]
-            print(sexuality)
+            
             if coin_flip(options.percent_truthful) == 1:
                 participant = ParticipantStrategic(i, gender, sexuality)
             else:
@@ -134,16 +135,20 @@ class Sim:
             
     def print_results(self):
 
+        count_match = 0
         print("Match results")
         print("------------------------------")
         for participant in self.participants:
             if participant.paired_with:
+                count_match += 1
                 print("Participant " + str(participant.id) + " matched with Participant " + str(participant.paired_with.id))
             else:
                 print("Participant " + str(participant.id) + " unmatched")
         print("------------------------------")
 
-        print("Average utility among participants:", self.avg_utility)
+        self.percent_match = count_match  / self.num_participants
+        print("Average utility among participants: " + str(self.avg_utility))
+        print("% Match: " + str(self.percent_match * 100) + "%")
 
 
             
@@ -191,13 +196,15 @@ def main(args):
     print(options)
     
     utilities = []
+    percent_matches = []
     stabilities = []
     for i in range(options.num_reps):
         sim = Sim(options)
         sim.runMatch()
         sim.calc_avg_utility()
         sim.print_results()
-        utilities.append(sim.avg_utility);
+        utilities.append(sim.avg_utility)
+        percent_matches.append(sim.percent_match * 100)
 
         if options.check_stability:
             print("Checking Stability")
@@ -209,6 +216,7 @@ def main(args):
     if options.check_stability:
         print(sum(stabilities) / len(stabilities), "percent of simulations resulted in a stable matching.")
     print("The utility across runs was", sum(utilities) / len(utilities))
+    print("The average percent match", sum(percent_matches) / len(percent_matches))
 
 
 if __name__ == "__main__":
