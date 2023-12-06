@@ -35,6 +35,11 @@ class Sim:
         self.num_participants = num_women  + num_nb + num_men
 
         sexualities = list(chain.from_iterable(combinations([FEMALE, MALE, NONBINARY], r) for r in range(1, 4)))
+        weights = []
+        if options.flex:
+            weights = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4]
+        else:
+            weights = [1/7]*7
 
         for i in range(self.num_participants):
             # generate gender
@@ -46,11 +51,12 @@ class Sim:
                 gender = MALE
 
             # generate sexuality
-            sexuality_id = random.randint(0,len(sexualities)-1)
+            sexuality = random.choices(sexualities, weights, k=1)[0]
+            print(sexuality)
             if coin_flip(options.percent_truthful) == 1:
-                participant = ParticipantStrategic(i, gender, sexualities[sexuality_id])
+                participant = ParticipantStrategic(i, gender, sexuality)
             else:
-                participant = ParticipantTruthful(i, gender, sexualities[sexuality_id])
+                participant = ParticipantTruthful(i, gender, sexuality)
             self.participants.add(participant)
 
         for participant in self.participants:
@@ -176,6 +182,10 @@ def main(args):
     parser.add_option("--percentTruthful",
                       dest="percent_truthful", default=1, type="float",
                       help="Set the percentage of agents who are truthful.")
+    
+    parser.add_option("--flex",
+                      dest="flex", default=False, action="store_true",
+                      help="Set whether or not you want to weight towards pansexual participants.")
 
     (options, args) = parser.parse_args()
     print(options)
