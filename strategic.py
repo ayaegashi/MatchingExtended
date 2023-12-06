@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import random
-# import uuid
 
 class ParticipantStrategic:
     def __init__(self, id, gender, sexuality):
@@ -15,8 +14,8 @@ class ParticipantStrategic:
         self.just_rejected = None
         self.ask_rank = 0
 
-    def preference_order(self, agents):
-        # Need to match on own sexuality, other agent's sexuality
+    def generate_preference_order(self, agents):
+        # Need to match on own sexuality, other agent's sexuality, and sort by desirability of matches
         not_attracted = []
         attracted = []
         for agent in agents:
@@ -25,7 +24,7 @@ class ParticipantStrategic:
             else:
                 not_attracted.append(agent)
 
-        attracted = sorted(attracted, lambda x: abs(self.desirability - x.desirability), reverse=True)
+        attracted = sorted(attracted, key=lambda x: abs(self.desirability - x.desirability), reverse=True)
         self.preference_order_list = attracted + not_attracted
         self.cutoff = len(attracted)
 

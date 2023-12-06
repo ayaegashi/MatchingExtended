@@ -46,7 +46,7 @@ class Sim:
 
             # generate sexuality
             sexuality_id = random.randint(0,len(sexualities)-1)
-            participant = ParticipantTruthful(i, gender, sexualities[sexuality_id])
+            participant = ParticipantStrategic(i, gender, sexualities[sexuality_id])
             self.participants.add(participant)
 
         for participant in self.participants:
