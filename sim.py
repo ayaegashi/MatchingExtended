@@ -24,12 +24,12 @@ NONBINARY = 2
 
 
 class Sim:
-    def __init__(self):
+    def __init__(self, options):
         self.participants = set()
         self.total_utility = 0
-        num_women = 10
-        num_men = 10
-        num_nb = 10
+        num_women = options.num_women
+        num_men = options.num_men
+        num_nb = options.num_nb
         total = num_women  + num_nb + num_men
 
         sexualities = list(chain.from_iterable(combinations([FEMALE, MALE, NONBINARY], r) for r in range(1, 4)))
@@ -129,18 +129,18 @@ class Sim:
 
 
             
-new_simulation = Sim()
-new_simulation.runMatch()
+# new_simulation = Sim()
+# new_simulation.runMatch()
 
-print("truthful sim")
-for participant in new_simulation.participants:
-    print("PARTICIPANT " + str(participant.id))
-    if participant.paired_with:
-        print("matched with " + str(participant.paired_with.id))
-    else:
-        print("no match")
+# print("truthful sim")
+# for participant in new_simulation.participants:
+#     print("PARTICIPANT " + str(participant.id))
+#     if participant.paired_with:
+#         print("matched with " + str(participant.paired_with.id))
+#     else:
+#         print("no match")
 
-print(new_simulation.total_utility)
+# print(new_simulation.total_utility)
         
 
 
@@ -155,55 +155,45 @@ print(new_simulation.total_utility)
 #     return count
 
 
-# def main(args):
-#     usage_msg = "Usage:  %prog [options] PeerClass1[,count] PeerClass2[,count] ..."
-#     parser = OptionParser(usage=usage_msg)
+def main(args):
+    usage_msg = "Usage:  %prog [options] PeerClass1[,count] PeerClass2[,count] ..."
+    parser = OptionParser(usage=usage_msg)
 
-#     def usage(msg):
-#         print(("Error: %s\n" % msg))
-#         parser.print_help()
-#         sys.exit()
+    def usage(msg):
+        print(("Error: %s\n" % msg))
+        parser.print_help()
+        sys.exit()
 
-#     parser.add_option("--numWomen",
-#                       dest="num_women", default=5, type="int",
-#                       help="Set number of women in simulation")
+    parser.add_option("--numWomen",
+                      dest="num_women", default=5, type="int",
+                      help="Set number of women in simulation")
 
-#     parser.add_option("--numNonBinary",
-#                       dest="num_nb", default=5, type="int",
-#                       help="Set number of nonbinary people in simulation")
+    parser.add_option("--numNonBinary",
+                      dest="num_nb", default=5, type="int",
+                      help="Set number of nonbinary people in simulation")
 
-#     parser.add_option("--numMen",
-#                       dest="num_men", default=5, type="int",
-#                       help="Set number of men in simulation")
+    parser.add_option("--numMen",
+                      dest="num_men", default=5, type="int",
+                      help="Set number of men in simulation")
+    
+    parser.add_option("--checkStability",
+                      dest="check_stability", default=False, action="store_true",
+                      help="Set whether or not you want to check for stability")
 
-#     (options, args) = parser.parse_args()
+    (options, args) = parser.parse_args()
+    print(options)
+    
+    sim = Sim(options)
+    sim.runMatch
 
-#     # leftover args are class names, with optional counts:
-#     # "Peer Seed[,4]"
-
-#     if len(args) == 0:
-#         # default
-#         strategic_count = 0
-#     else:
-#         try:
-#             strategic_count = parse_strategic(args)
-#         except ValueError as e:
-#             usage(e)
-
-#     configure_logging(options.loglevel)
-#     config = Params()
-
-#     config.add("num_women", options.num_women)
-#     config.add("num_nb", options.blocks_nb)
-#     config.add("num_men", options.max_men)
-
-#     sim = Sim(config)
-#     sim.run_sim()
+    if options.check_stability:
+        print("Checking Stability")
+        print(sim.check_if_stable())
 
 
-# if __name__ == "__main__":
-#     # The next two lines are for profiling...
-#     import cProfile
+if __name__ == "__main__":
+    # The next two lines are for profiling...
+    import cProfile
 
-#     cProfile.run('main(sys.argv)', 'out.prof')
-# #    main(sys.argv)
+    cProfile.run('main(sys.argv)', 'out.prof')
+#    main(sys.argv)
