@@ -214,7 +214,7 @@ def main(args):
         
     # Print results:
     if options.check_stability:
-        print(sum(stabilities) / len(stabilities), "percent of simulations resulted in a stable matching.")
+        print(sum(stabilities) * 100 / len(stabilities), "percent of simulations resulted in a stable matching.")
     print("The utility across runs was", sum(utilities) / len(utilities))
     print("The average percent match", sum(percent_matches) / len(percent_matches))
 
